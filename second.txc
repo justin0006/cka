@@ -1,0 +1,43 @@
+k scale deployment/login --replicas=2 // it will create r pod replicas
+
+==>>suppose you have one pod running and its mapped with disk with RWO and now you have scaled
+up a same pod in another worker node so now how we will mapped storage in another Pod?
+
+we will use file disk storage
+
+For WEb and Backend we can easily scale up by replica set, hpa but what about DB
+
+suppose your mysql pod is running in 3 worker nodes 3 replica set? So which persistent vol type will be using? 
+ans: In production we will mark one pod as a master Pod which has RW allow, while other 2 pods mark as a read only. So what we will do is we will assign storage to each Pod and whatever data is storage in master pod. another Pod which has only read will take a back up data from master pod....this way we will reduce a load from master pod
+
+
+Through PVC template we can do this so each Pod will have their sepearte storage
+our db is created in var/lib/mysql
+
+in github under yaml looks for sts template
+
+kind : we need to use StatefulSet
+
+K get pvc
+k get pv
+
+k get pods -o wide
+
+k scale sts/db1 --replicas=3    //std is StatefulSet, 3pvc get created
+
+we have mapped through template, automatically it will created pvc and pv
+Each Pod is having its own storage.
+But now we need to write different algoritham because when data store in master pod and to transfer data from master pod to another pod we need top write algoritham. its nothing to do with k8s. we need to define it that data should replicate from one pod to another pod. 
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+Static provisioning 
+
+Storage class is use to integrate with external drives eg  azure blob, ebd. omn premises in K8s cluster
+
+CSI drivers is disk Storage and File Storage
+Disk s is available for one node. and file s will be available for all nodes
+
+K get sc //will list all storage class
+
+k edit sc namehere //its a pod you will more info
+
+k edit sc default
+
+k edit sc azurefile ///this is file s
+
+==>>Static provisioning is first persistent vol is created then PVc persistent vol claim and then map inside the container
+==>>Dynamic provisioning first pvc is created then it mapped with container and automatically  persistent vol is created in background => pvc is accessible in Namespace only
+
+Filesystem Its mounted into pods into a directory
+Block use a vol as a raw Block device
+
+lets write our dynamic provisioning
+mkdir /data, cd data, touch pvc1.yaml, deployment.yaml
+type notepad.yaml  //it will open in notepad as well
+
+
+accessmode are: RWO-mounted a s read, write once   //for block storage  
+                ROX-mounted as a read only by many
+                RWX- mounted as read write by many
+eg: RWX will map the persistent vol to the multiple worker nodes
+only file s will support above
+
+
+k apply -f pvc1.yaml
+k get pvc
+
+Now we need to create a pod and mapped it
+
+K create deployment login --image=httpd --dry-run -o yaml >  deployment.yaml
+vi deployment.yaml
+//at bottom we need to write
+     
+   mountpoint: /
+  Volumes: 
+   -name: v1
+   persistentVolumeClaim;
+     Claim: pvc1
+
+     done now pv is created automatically blob storage
+
+     
